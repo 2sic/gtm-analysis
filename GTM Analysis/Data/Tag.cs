@@ -13,10 +13,10 @@ namespace ToSic.Om.Gtm.Analysis.Data
         public string Type => _original.type;
         public int[] Triggers;
 
-        private readonly JsonSchema.ContainerVersion _container;
+        private readonly ContainerVersion _container;
         private readonly JsonSchema.Tag _original;
 
-        public Tag(JsonSchema.Tag original, JsonSchema.ContainerVersion container)
+        public Tag(JsonSchema.Tag original, ContainerVersion container)
         {
 
             Id = Convert.ToInt32(original.tagId);
@@ -72,13 +72,20 @@ namespace ToSic.Om.Gtm.Analysis.Data
         {
             if (Type != "ua") return;
 
-            AddToDict(dict, "TrackId", "trackingId");
+            AddToDict(dict, "TrackId", "trackingId", ResolveVariableIfPossible);
             AddToDict(dict, "Tracking", "trackType", MapTrackType);
             AddToDict(dict, "LogCat", "eventCategory");
             AddToDict(dict, "LocAct", "eventAction");
             AddToDict(dict, "LogLbl", "eventLabel");
             AddToDict(dict, "LogVal", "value");
             AddToDict(dict, KeyInteractive, "nonInteraction", MapInteraction);
+        }
+
+        private string ResolveVariableIfPossible(string key)
+        {
+            var found = _container.ResolveVariable(key);
+            if (found != key) found = "$" + found;
+            return found;
         }
 
 
