@@ -33,9 +33,6 @@ namespace ToSic.Om.Gtm.Analysis
 
             var trigs = triggers.Select(t => new Trigger(t)).ToList();
 
-            //var tbl = new TriggerList(trigs);
-
-            //var debug = JsonConvert.SerializeObject(tbl.Data);
             var debug = ToCsv.CsvTriggers(trigs);
             Console.Write("debug:\n" + debug);
 

@@ -23,13 +23,28 @@ namespace ToSic.Om.Gtm.Analysis.Data
         public dynamic ForTable()
         {
             dynamic data = new ExpandoObject();
-            data.Name = Name;
+            data.Name = NameCleaned;
             data.Type = Type;
             var exp = data as IDictionary<string, Object>;
             foreach (var f in Filters)
-                exp.Add(f.Key, f.Value);
+                exp.Add(f.Key, f.OperatorCode + f.Value);
             return data;
         }
+
+        public string NameCleaned
+        {
+            get
+            {
+                switch (Name)
+                {
+                    //case "{{Click ID}}":
+                    //    return 
+                    default:
+                        return Name;
+                }
+            }
+        }
+
     }
 
 }

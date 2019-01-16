@@ -14,5 +14,21 @@ namespace ToSic.Om.Gtm.Analysis.Data
             Key = original.parameter.First(p => p.key == "arg0").value;
             Value = original.parameter.First(p => p.key == "arg1").value;
         }
+
+
+
+        public string OperatorCode
+        {
+            get
+            {
+             switch (Type.ToLowerInvariant())
+            {
+                case "contains":
+                    return "~";
+                default:
+                    return "?";
+            }
+            }
+        }
     }
 }

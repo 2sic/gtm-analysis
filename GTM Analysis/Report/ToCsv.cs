@@ -16,7 +16,6 @@ namespace ToSic.Om.Gtm.Analysis.Report
 
                 return writer.ToString();
             }
-            
         }
     }
 }
