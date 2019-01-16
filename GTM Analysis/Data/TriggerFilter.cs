@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using ToSic.Om.Gtm.Analysis.JsonSchema;
 
 namespace ToSic.Om.Gtm.Analysis.Data
 {
@@ -11,8 +12,8 @@ namespace ToSic.Om.Gtm.Analysis.Data
         public TriggerFilter(JsonSchema.TriggerFilter original)
         {
             Type = original.type;
-            Key = original.parameter.First(p => p.key == "arg0").value;
-            Value = original.parameter.First(p => p.key == "arg1").value;
+            Key = original.parameter.Find("arg0").GetValue;
+            Value = original.parameter.Find("arg1").GetValue;
         }
 
 

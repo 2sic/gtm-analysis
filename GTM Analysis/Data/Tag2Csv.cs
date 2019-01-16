@@ -6,7 +6,7 @@ using ToSic.Om.Gtm.Analysis.JsonSchema;
 
 namespace ToSic.Om.Gtm.Analysis.Data
 {
-    public class Tag: IPreparesForCsv
+    public class Tag2Csv: IPreparesForCsv
     {
         public int Id;
         public string Name => _original.name;
@@ -16,7 +16,7 @@ namespace ToSic.Om.Gtm.Analysis.Data
         private readonly ContainerVersion _container;
         private readonly JsonSchema.Tag _original;
 
-        public Tag(JsonSchema.Tag original, ContainerVersion container)
+        public Tag2Csv(JsonSchema.Tag original, ContainerVersion container)
         {
 
             Id = Convert.ToInt32(original.tagId);
@@ -34,6 +34,7 @@ namespace ToSic.Om.Gtm.Analysis.Data
             if (!flatten)
             {
                 var data = BuildCoreCsv(-1);
+                AddTrailingProperties(data);
                 return new List<dynamic> {data};
             }
 
@@ -50,6 +51,7 @@ namespace ToSic.Om.Gtm.Analysis.Data
                     foreach (var trigD in triggerData)
                         asDict.Add("!" + trigD.Key, trigD.Value);
                 }
+                AddTrailingProperties(data);
                 return (dynamic) data;
             }).ToList();
             return list;
@@ -62,22 +64,48 @@ namespace ToSic.Om.Gtm.Analysis.Data
             data.Name = Name;
             data.Type = Type;
             data.Fire = NiceTagFiring();
-            data.Trigger = triggerId != -1 ? triggerId.ToString() : string.Join(",", Triggers.Select(t => t.ToString()));
             var dict = data as IDictionary<string, object>;
+            var trig = triggerId != -1 ? triggerId.ToString() : string.Join(",", Triggers.Select(t => t.ToString()));
+            dict.Add("Trigger(!)", trig);
             PrepUaProperties(dict);
             return data;
         }
+
+        /// <summary>
+        /// Append any additional fields, which are typically not relevant but usefull to include
+        /// </summary>
+        /// <param name="original"></param>
+        private void AddTrailingProperties(ExpandoObject original)
+        {
+            if (Type != "ua") return;
+
+            const string FieldsToSet = "fieldsToSet";
+            var fields = _original.parameter.Find(FieldsToSet);
+            if (fields != null)
+            {
+                //var fieldList = fields.GetValue;
+                AddToDict(original, "UaFields", FieldsToSet);
+            }
+        }
+
+        private const string OutTrackId = "TrackId";
+        private const string OutTracking = "Tracking";
+        private const string OutCat = "AnlytCat";
+        private const string OutAct = "AnlytAct";
+        private const string OutLbl = "AnlytLbl";
+        private const string OutVal = "AnlytVal";
+        public static readonly string[] Fields = {OutTrackId, OutTracking, OutCat, OutAct, OutLbl, OutVal};
 
         private void PrepUaProperties(IDictionary<string, object> dict)
         {
             if (Type != "ua") return;
 
-            AddToDict(dict, "TrackId", "trackingId", ResolveVariableIfPossible);
-            AddToDict(dict, "Tracking", "trackType", MapTrackType);
-            AddToDict(dict, "LogCat", "eventCategory");
-            AddToDict(dict, "LocAct", "eventAction");
-            AddToDict(dict, "LogLbl", "eventLabel");
-            AddToDict(dict, "LogVal", "value");
+            AddToDict(dict, OutTrackId, "trackingId", ResolveVariableIfPossible);
+            AddToDict(dict, OutTracking, "trackType", MapTrackType);
+            AddToDict(dict, OutCat, "eventCategory", ResolveVariableIfPossible);
+            AddToDict(dict, OutAct, "eventAction", ResolveVariableIfPossible);
+            AddToDict(dict, OutLbl, "eventLabel", ResolveVariableIfPossible);
+            AddToDict(dict, OutVal, "value", ResolveVariableIfPossible);
             AddToDict(dict, KeyInteractive, "nonInteraction", MapInteraction);
         }
 
@@ -94,7 +122,7 @@ namespace ToSic.Om.Gtm.Analysis.Data
 
         private void AddToDict<T>(IDictionary<string, object> dict, string property, string key, Func<string, T> mapper = null)
         {
-            var val = _original.parameter.Find(key)?.value;
+            var val = _original.parameter.Find(key)?.GetValue;
             var save = mapper == null ? (object) val : mapper.Invoke(val);
             dict.Add(property, save);
         }

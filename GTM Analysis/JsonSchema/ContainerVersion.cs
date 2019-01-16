@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using CommandLine;
 
 namespace ToSic.Om.Gtm.Analysis.JsonSchema
 {
@@ -16,13 +17,20 @@ namespace ToSic.Om.Gtm.Analysis.JsonSchema
 
         public string ResolveVariable(string key)
         {
+            if (key == null) return null;
             if (!key.StartsWith("{{") || !key.EndsWith("}}")) return key;
 
             var realKey = key.Substring(2, key.Length - 4);
             var found = variable.FirstOrDefault(v => v.name == realKey);
             if (found == null) return key;
 
-            var result = found.parameter.FirstOrDefault(p => p.key == "value")?.value;
+            var result = found.parameter.Find("value")?.GetValue;
+            if (result == null)
+            {
+                var maybeJs = found.parameter.Find("javascript")?.GetValue;
+                if (maybeJs != null)
+                    result = "js(...)";
+            }
             return result ?? key;
         }
     }
