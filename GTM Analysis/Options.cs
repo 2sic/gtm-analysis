@@ -9,5 +9,8 @@ namespace ToSic.Om.Gtm.Analysis
 
         [Option('i', "in", Required = true, HelpText = "always specify an in-file name")]
         public string File { get; set; }
+
+        [Option('o', "output", Required = true, HelpText = "Pls always specify an out-path parameter")]
+        public string Path { get; set; }
     }
 }

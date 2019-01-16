@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 
 namespace ToSic.Om.Gtm.Analysis.Data
 {
-    public class Trigger
+    public class Trigger: IPreparesForCsv
     {
         public int Id;
         public string Name;
@@ -20,29 +19,15 @@ namespace ToSic.Om.Gtm.Analysis.Data
             Filters = original.filter.Select(f => new TriggerFilter(f)).ToArray();
         }
 
-        public dynamic ForTable()
+        public List<dynamic> PrepareForCsv(bool flatten = false)
         {
             dynamic data = new ExpandoObject();
-            data.Name = NameCleaned;
+            data.Name = Name;
             data.Type = Type;
-            var exp = data as IDictionary<string, Object>;
+            var exp = data as IDictionary<string, object>;
             foreach (var f in Filters)
                 exp.Add(f.Key, f.OperatorCode + f.Value);
-            return data;
-        }
-
-        public string NameCleaned
-        {
-            get
-            {
-                switch (Name)
-                {
-                    //case "{{Click ID}}":
-                    //    return 
-                    default:
-                        return Name;
-                }
-            }
+            return new List<dynamic> {data};
         }
 
     }

@@ -1,15 +1,15 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using CommandLine;
 using Newtonsoft.Json;
-using ToSic.Om.Gtm.Analysis.Data;
 using ToSic.Om.Gtm.Analysis.Report;
 
 namespace ToSic.Om.Gtm.Analysis
 {
     internal class Program
     {
+        private const bool StopWhenDebugging = false;
+
         static void Main(string[] args)
         {
             Parser.Default.ParseArguments<Options>(args)
@@ -18,7 +18,7 @@ namespace ToSic.Om.Gtm.Analysis
                 ;
 
             // await keypress before closing the window
-            if (System.Diagnostics.Debugger.IsAttached) Console.ReadKey();
+            if (StopWhenDebugging && System.Diagnostics.Debugger.IsAttached) Console.ReadKey();
         }
 
         private static void RunOptionsAndReturnExitCode(Options opts)
@@ -29,12 +29,8 @@ namespace ToSic.Om.Gtm.Analysis
 
             var data = JsonConvert.DeserializeObject<JsonSchema.File>(json);
 
-            var triggers = data.containerVersion.trigger;
-
-            var trigs = triggers.Select(t => new Trigger(t)).ToList();
-
-            var debug = ToCsv.CsvTriggers(trigs);
-            Console.Write("debug:\n" + debug);
+            var csv = new ToCsv(opts.Path);
+            csv.Create(data);
 
             Console.WriteLine("data read into object");
         }

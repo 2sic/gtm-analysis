@@ -70,7 +70,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\IPreparesForCsv.cs" />
+    <Compile Include="Data\Tag.cs" />
     <Compile Include="Extractors\Triggers.cs" />
+    <Compile Include="JsonSchema\Helpers.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
