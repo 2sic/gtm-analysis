@@ -2,4 +2,7 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-/GTM Analysis/.vs/GTM Analysis/v15
+**/.vs/
+/packages
+/GTM Analysis/bin/
+/GTM Analysis/obj/
