@@ -1,15 +1,14 @@
-﻿using System.Linq;
-using ToSic.Om.Gtm.Analysis.JsonSchema;
+﻿using ToSic.Om.Gtm.Analysis.JsonSchema;
 
 namespace ToSic.Om.Gtm.Analysis.Data
 {
-    public class TriggerFilter
+    public class TriggerFilter2Csv
     {
         public string Type;
         public string Key;
         public string Value;
 
-        public TriggerFilter(JsonSchema.TriggerFilter original)
+        public TriggerFilter2Csv(TriggerFilter original)
         {
             Type = original.type;
             Key = original.parameter.Find("arg0").GetValue;
@@ -24,10 +23,9 @@ namespace ToSic.Om.Gtm.Analysis.Data
             {
              switch (Type.ToLowerInvariant())
             {
-                case "contains":
-                    return "~";
-                default:
-                    return "?";
+                case "contains": return "~";
+                case "equals": return " =";
+                default: return "?";
             }
             }
         }

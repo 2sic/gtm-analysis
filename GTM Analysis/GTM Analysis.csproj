@@ -90,8 +90,8 @@
     <Compile Include="JsonSchema\TriggerFilter.cs" />
     <Compile Include="JsonSchema\Variable.cs" />
     <Compile Include="JsonSchema\VariableBuiltIn.cs" />
-    <Compile Include="Data\Trigger.cs" />
-    <Compile Include="Data\TriggerFilter.cs" />
+    <Compile Include="Data\Trigger2Csv.cs" />
+    <Compile Include="Data\TriggerFilter2Csv.cs" />
     <Compile Include="Report\ToCsv.cs" />
     <Compile Include="Report\TriggerList.cs" />
   </ItemGroup>

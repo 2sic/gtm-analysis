@@ -14,9 +14,9 @@ namespace ToSic.Om.Gtm.Analysis.Data
         public int[] Triggers;
 
         private readonly ContainerVersion _container;
-        private readonly JsonSchema.Tag _original;
+        private readonly Tag _original;
 
-        public Tag2Csv(JsonSchema.Tag original, ContainerVersion container)
+        public Tag2Csv(Tag original, ContainerVersion container)
         {
 
             Id = Convert.ToInt32(original.tagId);
@@ -46,7 +46,7 @@ namespace ToSic.Om.Gtm.Analysis.Data
                 var foundTrigger = _container.trigger.FirstOrDefault(t => t.triggerId == ftid);
                 if (foundTrigger != null)
                 {
-                    var triggerData = new Trigger(foundTrigger).PrepareForCsv().First() as IDictionary<string, object>;
+                    var triggerData = new Trigger2Csv(foundTrigger).PrepareForCsv().First() as IDictionary<string, object>;
                     var asDict = (IDictionary<string, object>) data;
                     foreach (var trigD in triggerData)
                         asDict.Add("!" + trigD.Key, trigD.Value);

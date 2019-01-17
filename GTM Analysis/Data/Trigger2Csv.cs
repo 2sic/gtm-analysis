@@ -4,19 +4,19 @@ using System.Linq;
 
 namespace ToSic.Om.Gtm.Analysis.Data
 {
-    public class Trigger: IPreparesForCsv
+    public class Trigger2Csv: IPreparesForCsv
     {
         public int Id;
         public string Name;
         public string Type;
-        public TriggerFilter[] Filters;
+        public TriggerFilter2Csv[] Filters;
 
-        public Trigger(JsonSchema.Trigger original)
+        public Trigger2Csv(JsonSchema.Trigger original)
         {
             Type = original.type;
             Id = original.triggerId;
             Name = original.name;
-            Filters = original.filter.Select(f => new TriggerFilter(f)).ToArray();
+            Filters = original.filter.Select(f => new TriggerFilter2Csv(f)).ToArray();
         }
 
         public List<dynamic> PrepareForCsv(bool flatten = false)

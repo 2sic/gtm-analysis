@@ -22,7 +22,7 @@ namespace ToSic.Om.Gtm.Analysis.Report
         public void Create(JsonSchema.File file)
         {
             // Export triggers
-            var trigs = file.containerVersion.trigger.Select(t => new Trigger(t)).ToList();
+            var trigs = file.containerVersion.trigger.Select(t => new Trigger2Csv(t)).ToList();
             var dynList = trigs.SelectMany(t => t.PrepareForCsv()).ToList();
             var csvTriggers = CreateCsv(dynList);
             File.WriteAllText(Path + "\\triggers.csv", csvTriggers, Encoding.UTF8);

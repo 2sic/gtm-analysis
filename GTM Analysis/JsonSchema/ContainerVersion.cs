@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using CommandLine;
 
 namespace ToSic.Om.Gtm.Analysis.JsonSchema
 {
