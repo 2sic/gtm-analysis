@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <StartArguments>-i ..\..\test-data\GTM-N682WX5_workspace65.json -o ..\..\test-data\out</StartArguments>
+    <StartArguments>-i ..\..\test-data\GTM-N682WX5_workspace71.json -o ..\..\test-data\out</StartArguments>
   </PropertyGroup>
   <PropertyGroup>
     <PublishUrlHistory>publish\</PublishUrlHistory>

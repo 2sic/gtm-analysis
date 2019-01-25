@@ -16,7 +16,9 @@ namespace ToSic.Om.Gtm.Analysis.Data
         private readonly ContainerVersion _container;
         private readonly Tag _original;
 
-        public Tag2Csv(Tag original, ContainerVersion container)
+        public readonly bool Flatten;
+
+        public Tag2Csv(Tag original, ContainerVersion container, bool flatten)
         {
 
             Id = Convert.ToInt32(original.tagId);
@@ -24,16 +26,15 @@ namespace ToSic.Om.Gtm.Analysis.Data
 
             _container = container;
             _original = original;
+            Flatten = flatten;
         }
 
-        private const string KeyInteractive = "Interact";
-
-        public List<dynamic> PrepareForCsv(bool flatten = false)
+        public List<dynamic> PrepareForCsv(/*bool flatten = false*/)
         {
             // not flat, just one record per tag
-            if (!flatten)
+            if (!Flatten)
             {
-                var data = BuildCoreCsv(-1);
+                var data = BuildCoreCsv(DontShowTriggersInTag);
                 AddTrailingProperties(data);
                 return new List<dynamic> {data};
             }
@@ -42,12 +43,13 @@ namespace ToSic.Om.Gtm.Analysis.Data
             var list = Triggers.Select(ftid =>
             {
                 var data = BuildCoreCsv(ftid);
-                ((dynamic) data).Triggers = ftid;
+                var asDict = (IDictionary<string, object>)data;
+                asDict.Add(OutTrigId, ftid);
+                //((dynamic) data).TrigId = ftid;
                 var foundTrigger = _container.trigger.FirstOrDefault(t => t.triggerId == ftid);
                 if (foundTrigger != null)
                 {
                     var triggerData = new Trigger2Csv(foundTrigger).PrepareForCsv().First() as IDictionary<string, object>;
-                    var asDict = (IDictionary<string, object>) data;
                     foreach (var trigD in triggerData)
                         asDict.Add("!" + trigD.Key, trigD.Value);
                 }
@@ -57,16 +59,63 @@ namespace ToSic.Om.Gtm.Analysis.Data
             return list;
         }
 
-        private ExpandoObject BuildCoreCsv(int triggerId = -1)
+        private const int DontShowTriggersInTag = -1;
+        private const string OutId = "Id",
+            OutState = "State",
+            OutName = "Name",
+            OutType = "Type",
+            OutFire = "Fire",
+            OutTriggerNumbers = "Trigger(!)",
+            OutTrackId = "TrackId",
+            OutTracking = "Tracking",
+            OutCat = "AnlytCat",
+            OutAct = "AnlytAct",
+            OutLbl = "AnlytLbl",
+            OutVal = "AnlytVal",
+            OutInteract = "Interact", 
+            OutTrigId = "!TrgId";
+
+        private static readonly string[] Fields =
+        {
+            OutId, OutState, OutName, OutType, OutFire, 
+            OutTrackId, OutTracking, OutCat, OutAct, OutLbl, OutVal, OutInteract
+        };
+
+        private static readonly string[] TriggerFields = {"!", OutTriggerNumbers, OutTrigId, "!Name", "!Type", "!{{Click ID}}",
+            "!{{Click Classes}}", "!{{Click Text}}", "!{{Click URL}}", "!{{Click Element}}",
+            "!{{Page URL}}", "UaFields" };
+
+        public static IEnumerable<string> CsvFields(bool flatten)
+        {
+            var fields = Fields.Concat(TriggerFields).ToList();
+            var removals = CsvFieldsToDrop(flatten);
+            if(removals.Count > 0)
+                fields.RemoveAll(removals.Contains);
+            return fields;
+        }
+
+        public static List<string> CsvFieldsToDrop(bool flatten) 
+            => flatten ? new List<string> {OutTriggerNumbers} : new List<string>();
+
+        private ExpandoObject BuildCoreCsv(int triggerId)
         {
             dynamic data = new ExpandoObject();
-            data.Id = Id;
-            data.Name = Name;
-            data.Type = Type;
-            data.Fire = NiceTagFiring();
             var dict = data as IDictionary<string, object>;
-            var trig = triggerId != -1 ? triggerId.ToString() : string.Join(",", Triggers.Select(t => t.ToString()));
-            dict.Add("Trigger(!)", trig);
+            dict.Add(OutId, Id);
+            dict.Add(OutState, _original.paused ? "pause" : "run");
+            dict.Add(OutName, Name);
+            dict.Add(OutType, Type);
+            dict.Add(OutFire, NiceTagFiring());
+
+            // only add trigger-id list if it's not in another column
+            if (triggerId != DontShowTriggersInTag)
+            {
+                dict.Add(OutTriggerNumbers, triggerId);
+                //var trig = triggerId != DontShowTriggersInTag
+                //    ? triggerId.ToString()
+                //    : string.Join(",", Triggers.Select(t => t.ToString()));
+                //dict.Add(OutTrigger, trig);
+            }
             PrepUaProperties(dict);
             return data;
         }
@@ -79,22 +128,12 @@ namespace ToSic.Om.Gtm.Analysis.Data
         {
             if (Type != "ua") return;
 
-            const string FieldsToSet = "fieldsToSet";
-            var fields = _original.parameter.Find(FieldsToSet);
+            const string fieldsToSet = "fieldsToSet";
+            var fields = _original.parameter.Find(fieldsToSet);
             if (fields != null)
-            {
-                //var fieldList = fields.GetValue;
-                AddToDict(original, "UaFields", FieldsToSet);
-            }
+                AddToDict(original, "UaFields", fieldsToSet);
         }
 
-        private const string OutTrackId = "TrackId";
-        private const string OutTracking = "Tracking";
-        private const string OutCat = "AnlytCat";
-        private const string OutAct = "AnlytAct";
-        private const string OutLbl = "AnlytLbl";
-        private const string OutVal = "AnlytVal";
-        public static readonly string[] Fields = {OutTrackId, OutTracking, OutCat, OutAct, OutLbl, OutVal};
 
         private void PrepUaProperties(IDictionary<string, object> dict)
         {
@@ -106,7 +145,7 @@ namespace ToSic.Om.Gtm.Analysis.Data
             AddToDict(dict, OutAct, "eventAction", ResolveVariableIfPossible);
             AddToDict(dict, OutLbl, "eventLabel", ResolveVariableIfPossible);
             AddToDict(dict, OutVal, "value", ResolveVariableIfPossible);
-            AddToDict(dict, KeyInteractive, "nonInteraction", MapInteraction);
+            AddToDict(dict, OutInteract, "nonInteraction", MapInteraction);
         }
 
         private string ResolveVariableIfPossible(string key)
@@ -132,8 +171,8 @@ namespace ToSic.Om.Gtm.Analysis.Data
             var original = _original.tagFiringOption;
             switch (original)
             {
-                case "ONCE_PER_EVENT": return "1X-EVENT";
-                case "ONCE_PER_LOAD": return "1X-LOAD";
+                case "ONCE_PER_EVENT": return "1/EVENT";
+                case "ONCE_PER_LOAD": return "1/LOAD";
                 default: return original;
             }
         }

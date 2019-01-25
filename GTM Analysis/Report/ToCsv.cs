@@ -28,13 +28,10 @@ namespace ToSic.Om.Gtm.Analysis.Report
             File.WriteAllText(Path + "\\triggers.csv", csvTriggers, Encoding.UTF8);
 
             // Export Tags
-            var mapped = file.containerVersion.tag.SelectMany(t => new Tag2Csv(t, file.containerVersion).PrepareForCsv(true)).ToList();
-            var knownKeysList =
-                ("Id;Name;Type;Fire;Trigger(!);" 
-                + string.Join(";", Tag2Csv.Fields)
-                + ";Interact;Triggers;!Name;!Type;!{{Click ID}};!{{Click Classes}};!{{Click Text}};!{{Click URL}};!{{Click Element}};!{{Page URL}};UaFields"
-                    ).Split(';').ToList();
-            mapped = ExpandMissingProperties(mapped, knownKeysList);
+            var flattenTable = true;
+            var mapped = file.containerVersion.tag.SelectMany(t => new Tag2Csv(t, file.containerVersion, flattenTable).PrepareForCsv()).ToList();
+            var knownKeysList = Tag2Csv.CsvFields(flattenTable).ToList();
+            mapped = ExpandMissingProperties(mapped, knownKeysList, Tag2Csv.CsvFieldsToDrop(flattenTable));
             var csvTags = CreateCsv(mapped);
             File.WriteAllText(Path + "\\tags.csv", csvTags, Encoding.UTF8);
 
@@ -50,8 +47,9 @@ namespace ToSic.Om.Gtm.Analysis.Report
             }
         }
 
-        private static List<dynamic> ExpandMissingProperties(List<dynamic> list, List<string> keys = null)
+        private static List<dynamic> ExpandMissingProperties(List<dynamic> list, List<string> keys, List<string> removals)
         {
+            // Build final key list
             if(keys == null) keys = new List<string>();
             foreach (var li in list)
             {
@@ -60,6 +58,10 @@ namespace ToSic.Om.Gtm.Analysis.Report
                     if (!keys.Contains(pair.Key))
                         keys.Add(pair.Key);
             }
+
+            // remove unwanted
+            if (removals != null && removals.Count > 0)
+                keys.RemoveAll(removals.Contains);
 
             //var newList = new List<dynamic>();
             var newList = list.Select(li =>
@@ -72,5 +74,6 @@ namespace ToSic.Om.Gtm.Analysis.Report
                 .ToList();
             return newList;
         }
+
     }
 }

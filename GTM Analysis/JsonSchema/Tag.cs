@@ -11,6 +11,7 @@ namespace ToSic.Om.Gtm.Analysis.JsonSchema
         public Parameter[] parameter;
         public string[] firingTriggerId;
         public string tagFiringOption;
+        public bool paused;
 
     }
 }

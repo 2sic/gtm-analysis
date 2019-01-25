@@ -4,6 +4,6 @@ namespace ToSic.Om.Gtm.Analysis.Data
 {
     public interface IPreparesForCsv
     {
-        List<dynamic> PrepareForCsv(bool flatten = false);
+        List<dynamic> PrepareForCsv(/*bool flatten = false*/);
     }
 }

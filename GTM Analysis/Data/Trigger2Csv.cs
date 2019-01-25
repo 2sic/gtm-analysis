@@ -19,7 +19,7 @@ namespace ToSic.Om.Gtm.Analysis.Data
             Filters = original.filter.Select(f => new TriggerFilter2Csv(f)).ToArray();
         }
 
-        public List<dynamic> PrepareForCsv(bool flatten = false)
+        public List<dynamic> PrepareForCsv(/*bool flatten = false*/)
         {
             dynamic data = new ExpandoObject();
             data.Name = Name;
