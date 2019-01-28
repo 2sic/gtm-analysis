@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using CsvHelper;
+using CsvHelper.Configuration;
 using ToSic.Om.Gtm.Analysis.Data;
 
 namespace ToSic.Om.Gtm.Analysis.Report
@@ -39,8 +40,9 @@ namespace ToSic.Om.Gtm.Analysis.Report
 
         public static string CreateCsv(List<dynamic> data)
         {
+            var conf = new Configuration {Delimiter = ";"};
             using (var writer = new StringWriter())
-            using (var csv = new CsvWriter(writer))
+            using (var csv = new CsvWriter(writer, conf))
             {
                 csv.WriteRecords(data);
                 return writer.ToString();
