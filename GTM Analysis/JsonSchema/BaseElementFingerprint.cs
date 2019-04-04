@@ -1,10 +1,10 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿// ReSharper disable InconsistentNaming
 
 namespace ToSic.Om.Gtm.Analysis.JsonSchema
 {
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class BaseElementFingerprint: BaseElement
     {
         public string fingerprint;
+        public string parentFolderId;
     }
 }

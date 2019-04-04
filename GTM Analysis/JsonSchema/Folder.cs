@@ -1,10 +1,9 @@
 ﻿// ReSharper disable InconsistentNaming
-
 namespace ToSic.Om.Gtm.Analysis.JsonSchema
 {
-    public class BaseElement
+    public class Folder: BaseElement
     {
-        public string accountId;
-        public string containerId;
+        public string folderId;
+        public string name;
     }
 }

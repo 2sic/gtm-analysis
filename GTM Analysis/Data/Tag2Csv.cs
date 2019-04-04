@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using ToSic.Om.Gtm.Analysis.JsonSchema;
+// ReSharper disable InconsistentNaming
 
 namespace ToSic.Om.Gtm.Analysis.Data
 {
@@ -11,6 +12,9 @@ namespace ToSic.Om.Gtm.Analysis.Data
         public int Id;
         public string Name => _original.name;
         public string Type => _original.type;
+
+        public string Folder => _container.ResolveFolder(_original.parentFolderId);
+
         public int[] Triggers;
 
         private readonly ContainerVersion _container;
@@ -60,7 +64,9 @@ namespace ToSic.Om.Gtm.Analysis.Data
         }
 
         private const int DontShowTriggersInTag = -1;
-        private const string OutId = "Id",
+        private const string 
+            OutId = "Id",
+            OutFolder = "Folder",
             OutState = "State",
             OutName = "Name",
             OutType = "Type",
@@ -77,7 +83,7 @@ namespace ToSic.Om.Gtm.Analysis.Data
 
         private static readonly string[] Fields =
         {
-            OutId, OutState, OutName, OutType, OutFire, 
+            OutId, OutFolder, OutState, OutName, OutType, OutFire, 
             OutTrackId, OutTracking, OutCat, OutAct, OutLbl, OutVal, OutInteract
         };
 
@@ -102,6 +108,7 @@ namespace ToSic.Om.Gtm.Analysis.Data
             dynamic data = new ExpandoObject();
             var dict = data as IDictionary<string, object>;
             dict.Add(OutId, Id);
+            dict.Add(OutFolder, Folder);
             dict.Add(OutState, _original.paused ? "pause" : "run");
             dict.Add(OutName, Name);
             dict.Add(OutType, Type);
@@ -121,7 +128,7 @@ namespace ToSic.Om.Gtm.Analysis.Data
         }
 
         /// <summary>
-        /// Append any additional fields, which are typically not relevant but usefull to include
+        /// Append any additional fields, which are typically not relevant but useful to include
         /// </summary>
         /// <param name="original"></param>
         private void AddTrailingProperties(ExpandoObject original)

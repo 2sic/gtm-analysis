@@ -73,6 +73,7 @@
     <Compile Include="Data\IPreparesForCsv.cs" />
     <Compile Include="Data\Tag2Csv.cs" />
     <Compile Include="Extractors\Triggers.cs" />
+    <Compile Include="JsonSchema\Folder.cs" />
     <Compile Include="JsonSchema\Helpers.cs" />
     <Compile Include="JsonSchema\ParameterLight.cs" />
     <Compile Include="JsonSchema\ParameterListItem.cs" />
